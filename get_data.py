@@ -96,4 +96,4 @@ path = sys.argv[1]
 for key in country2names.keys():
     os.system('mkdir %s/%s' % (current_time, key))
     for name in country2names[key]:
-        os.system('mv %s/%s.csv %s/%s' % (path, name, current_time, key))
+        os.system('mv "%s/%s".csv %s/%s' % (path, name, current_time, key))
