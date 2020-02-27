@@ -70,7 +70,8 @@ for key in country2urls.keys():
             driver.get(url)
             name = (By.CSS_SELECTOR, '.float_lang_base_1.inlineblock')
             name = WebDriverWait(driver, 30, 0.5).until(EC.presence_of_element_located(name))
-            names.append(name.text)
+            namestr = name.text.replace(' ', '_').replace('/', '_')
+            names.append(namestr)
             #names.append(driver.find_element_by_css_selector('.float_lang_base_1.inlineblock').text)
             print(names[-1])
             login = WebDriverWait(driver, 30, 0.5).until(EC.presence_of_element_located((By.CLASS_NAME, 'login')))
@@ -93,6 +94,12 @@ for key in country2urls.keys():
 current_time = time.strftime('%Y-%m-%d', time.localtime())
 os.mkdir(current_time)
 path = sys.argv[1]
+files = os.listdir(path)
+for f in files:
+    if f[-4:] == '.csv':
+        f_old = f
+        f = f.replace(' ','_').replace('/', '_')
+        os.system('mv "%s" %s' % (f_old, f))
 for key in country2names.keys():
     os.system('mkdir %s/%s' % (current_time, key))
     for name in country2names[key]:
