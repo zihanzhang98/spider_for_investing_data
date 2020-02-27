@@ -102,5 +102,6 @@ for key in country2urls.keys():
             driver.quit()
         except Exception as e:
             print('Download failure: %s' % url)
+            driver.quit()
     country2names[key] = names
 
