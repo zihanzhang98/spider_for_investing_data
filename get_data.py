@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 import time
 import os
+import shutil
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -54,6 +55,12 @@ for key in country2tbody.keys():
     sum_length += len(urls)
     country2urls[key] = urls
 
+current_time = time.strftime('%Y-%m-%d', time.localtime())
+os.mkdir(current_time)
+path = sys.argv[1]
+for key in country2urls.keys():
+    os.mkdir(path + '/' + current_time + '/' + key)
+fileset = set()
 country2names = {}
 for key in country2urls.keys():
     urls = country2urls[key]
@@ -85,22 +92,15 @@ for key in country2urls.keys():
             password.send_keys(Keys.ENTER)
             sleep(15)
             WebDriverWait(driver, 60, 0.5).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '.newBtn.LightGray.downloadBlueIcon.js-download-data'))).click()
-            #elem = driver.find_element_by_css_selector(".newBtn.LightGray.downloadBlueIcon.js-download-data")
             sleep(10)
+            filename = max([f for f in os.listdir(path)], key=os.path.getctime)
+            if filename[-3:] == 'csv' and (filename not in fileset):
+                os.system('mv "%s/%s" %s/%s' % (path, filename, current_time, key))
+                fileset.add(filename)
+            else:
+                print('Download failure: %s' % url)
             driver.quit()
         except Exception as e:
-            print(e)
+            print('Download failure: %s' % url)
     country2names[key] = names
-current_time = time.strftime('%Y-%m-%d', time.localtime())
-os.mkdir(current_time)
-path = sys.argv[1]
-files = os.listdir(path)
-for f in files:
-    if f[-4:] == '.csv':
-        f_old = f
-        f = f.replace(' ','_').replace('/', '_')
-        os.system('mv "%s" %s' % (f_old, f))
-for key in country2names.keys():
-    os.system('mkdir %s/%s' % (current_time, key))
-    for name in country2names[key]:
-        os.system('mv "%s/%s".csv %s/%s' % (path, name, current_time, key))
+
